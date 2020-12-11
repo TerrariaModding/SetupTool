@@ -52,8 +52,8 @@ namespace SetupTool.Tasks
 			if (Directory.Exists(_srcDir))
 				Directory.Delete(_srcDir, true);
 
-			var clientModule = _serverOnly ? null : ReadModule(Defines.TerrariaPath, new Version(Defines.ClientVersion));
-			var serverModule = ReadModule(Defines.TerrariaServerPath, new Version(Defines.ServerVersion));
+			var clientModule = _serverOnly ? null : ReadModule(Defines.TerrariaPath, new Version(Defines.ProjectConfig.ClientVersion));
+			var serverModule = ReadModule(Defines.TerrariaServerPath, new Version(Defines.ProjectConfig.ServerVersion));
 			var mainModule = _serverOnly ? serverModule : clientModule;
 
 			projectDecompiler = new ExtendedProjectDecompiler

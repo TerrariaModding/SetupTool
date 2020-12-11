@@ -13,8 +13,8 @@ namespace SetupTool
 		public static void Main(string[] args)
 		{
 			TaskRunner.RunTask(new CompositeTask(new ConsoleTaskCallback(),
-				new DecompileTask(new ConsoleTaskCallback(), Defines.DecompiledSrcDir),
-				new ProcessProjectTask(new ConsoleTaskCallback(), Defines.Projects)
+				new DecompileTask(new ConsoleTaskCallback(), Defines.ProjectConfig.DecompiledSrcDir),
+				new ProcessProjectTask(new ConsoleTaskCallback(), Defines.ProjectConfig.Projects)
 			));
 		}
 

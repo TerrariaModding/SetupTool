@@ -26,7 +26,7 @@ namespace SetupTool.Util
 		{
 			var status = "";
 
-			var errorLogFile = Path.Combine(Defines.LogsDir, "error.log");
+			var errorLogFile = Path.Combine(Defines.ProjectConfig.LogsDir, "error.log");
 			try
 			{
 				BaseTask.DeleteFile(errorLogFile);
@@ -82,7 +82,7 @@ namespace SetupTool.Util
 				Console.WriteLine();
 				Console.WriteLine("Error: " + e.Message.Trim());
 
-				BaseTask.CreateDirectory(Defines.LogsDir);
+				BaseTask.CreateDirectory(Defines.ProjectConfig.LogsDir);
 				File.WriteAllText(errorLogFile, status + "\r\n" + e);
 			}
 			finally

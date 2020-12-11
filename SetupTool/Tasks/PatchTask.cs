@@ -83,8 +83,8 @@ namespace SetupTool.Tasks
 
 			try
 			{
-				CreateDirectory(Defines.LogsDir);
-				logFile = new StreamWriter(Path.Combine(Defines.LogsDir, "patch.log"));
+				CreateDirectory(Defines.ProjectConfig.LogsDir);
+				logFile = new StreamWriter(Path.Combine(Defines.ProjectConfig.LogsDir, "patch.log"));
 
 				TaskInterface.SetMaxProgress(items.Count);
 				ExecuteParallel(items);
