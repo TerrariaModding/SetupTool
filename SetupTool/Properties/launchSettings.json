@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "SetupTool": {
+      "commandName": "Project",
+      "workingDirectory": "D:\\Repositories\\test\\newtest"
+    }
+  }
+}
