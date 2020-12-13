@@ -37,6 +37,20 @@ namespace SetupTool.Tasks
 		public FormatTask(ITaskInterface taskInterface) : base(taskInterface) { }
 
 		private static string projectPath; //persist across executions
+		
+		/*public override bool Configure() => (bool)TaskInterface.Invoke(new Func<bool>(() => {
+			var dialog = new OpenFileDialog
+			{
+				FileName = projectPath,
+				InitialDirectory = Path.GetDirectoryName(projectPath) ?? Path.GetFullPath("."),
+				Filter = "C# Project|*.csproj",
+				Title = "Select C# Project"
+			};
+
+			var result = dialog.ShowDialog();
+			projectPath = dialog.FileName;
+			return result == DialogResult.OK && File.Exists(projectPath);
+		}));*/
 
 		public override void Run()
 		{
