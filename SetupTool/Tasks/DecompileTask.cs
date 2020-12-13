@@ -46,6 +46,51 @@ namespace SetupTool.Tasks
 			_formatOutput = formatOutput;
 		}
 
+		public override bool Configure()
+		{
+			if (File.Exists(Defines.TerrariaPath) && File.Exists(Defines.TerrariaServerPath))
+				return true;
+
+			//return (bool)TaskInterface.Invoke(new Func<bool>(SelectTerrariaDialog));
+
+			return false;
+		}
+
+		/*public static bool SelectTerrariaDialog()
+		{
+			while (true)
+			{
+				var dialog = new OpenFileDialog
+				{
+					InitialDirectory = Path.GetFullPath(Directory.Exists(SteamDir) ? SteamDir : "."),
+					Filter = "Terraria|Terraria.exe",
+					Title = "Select Terraria.exe"
+				};
+
+				if (dialog.ShowDialog() != DialogResult.OK)
+					return false;
+
+				string err = null;
+				if (Path.GetFileName(dialog.FileName) != "Terraria.exe")
+					err = "File must be named Terraria.exe";
+				else if (!File.Exists(Path.Combine(Path.GetDirectoryName(dialog.FileName), "TerrariaServer.exe")))
+					err = "TerrariaServer.exe does not exist in the same directory";
+
+				if (err != null)
+				{
+					if (MessageBox.Show(err, "Invalid Selection", MessageBoxButtons.RetryCancel, MessageBoxIcon.Error) == DialogResult.Cancel)
+						return false;
+				}
+				else
+				{
+					Settings.Default.SteamDir = Path.GetDirectoryName(dialog.FileName);
+					Settings.Default.Save();
+					UpdateSteamDirTargetsFile();
+					return true;
+				}
+			}
+		}*/
+
 		public override void Run()
 		{
 			TaskInterface.SetStatus("Deleting Old Src");
