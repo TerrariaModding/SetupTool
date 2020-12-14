@@ -38,8 +38,9 @@ namespace SetupTool.Tasks
 
 			foreach (var (file, relPath) in PatchTask.EnumerateSrcFiles(patchedDir))
 			{
-				if (File.GetLastWriteTime(file) < cutoff.Get())
-					continue;
+				// This was being buggy
+				//if (File.GetLastWriteTime(file) < cutoff.Get())
+				//	continue;
 
 				if (!File.Exists(Path.Combine(baseDir, relPath)))
 					items.Add(new WorkItem("Copying: " + relPath, () => Copy(file, Path.Combine(patchDir, relPath))));
@@ -50,11 +51,14 @@ namespace SetupTool.Tasks
 			ExecuteParallel(items);
 
 			TaskInterface.SetStatus("Deleting Unnecessary Patches");
-			foreach (var (file, relPath) in EnumerateFiles(patchDir))
+			if (Directory.Exists(patchDir))
 			{
-				var targetPath = relPath.EndsWith(".patch") ? relPath.Substring(0, relPath.Length - 6) : relPath;
-				if (!File.Exists(Path.Combine(patchedDir, targetPath)))
-					DeleteFile(file);
+				foreach (var (file, relPath) in EnumerateFiles(patchDir))
+				{
+					var targetPath = relPath.EndsWith(".patch") ? relPath.Substring(0, relPath.Length - 6) : relPath;
+					if (!File.Exists(Path.Combine(patchedDir, targetPath)))
+						DeleteFile(file);
+				}
 			}
 
 			DeleteEmptyDirs(patchDir);

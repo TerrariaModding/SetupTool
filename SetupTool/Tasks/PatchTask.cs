@@ -56,19 +56,22 @@ namespace SetupTool.Tasks
 			var items = new List<WorkItem>();
 			var newFiles = new HashSet<string>();
 
-			foreach (var (file, relPath) in EnumerateFiles(patchDir))
+			if (Directory.Exists(patchDir))
 			{
-				if (relPath.EndsWith(".patch"))
+				foreach (var (file, relPath) in EnumerateFiles(patchDir))
 				{
-					items.Add(new WorkItem("Patching: " + relPath, () => newFiles.Add(PreparePath(Patch(file).PatchedPath))));
-					noCopy.Add(relPath.Substring(0, relPath.Length - 6));
-				}
-				else if (relPath != DiffTask.RemovedFileList)
-				{
-					string destination = Path.Combine(patchedDir, relPath);
+					if (relPath.EndsWith(".patch"))
+					{
+						items.Add(new WorkItem("Patching: " + relPath, () => newFiles.Add(PreparePath(Patch(file).PatchedPath))));
+						noCopy.Add(relPath.Substring(0, relPath.Length - 6));
+					}
+					else if (relPath != DiffTask.RemovedFileList)
+					{
+						string destination = Path.Combine(patchedDir, relPath);
 
-					items.Add(new WorkItem("Copying: " + relPath, () => Copy(file, destination)));
-					newFiles.Add(destination);
+						items.Add(new WorkItem("Copying: " + relPath, () => Copy(file, destination)));
+						newFiles.Add(destination);
+					}
 				}
 			}
 
