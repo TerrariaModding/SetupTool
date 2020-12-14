@@ -1,4 +1,4 @@
-﻿using SetupTool.Tasks;
+﻿/*using SetupTool.Tasks;
 using SetupTool.Util;
 using System;
 using System.IO;
@@ -69,3 +69,4 @@ namespace SetupTool
 		}
 	}
 }
+*/

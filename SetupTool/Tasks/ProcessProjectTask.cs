@@ -36,7 +36,7 @@ namespace SetupTool.Tasks
 					baseDir = Path.Combine(Defines.ProjectConfig.SrcDir, _projects[project.Parent].SrcDir);
 				}
 
-				new PatchTask(new Program.ConsoleTaskCallback(),
+				new PatchTask(TaskInterface,
 					baseDir,
 					Path.Combine(Defines.ProjectConfig.SrcDir, project.SrcDir),
 					Path.Combine(Defines.ProjectConfig.PatchesDir, project.PatchesDir),

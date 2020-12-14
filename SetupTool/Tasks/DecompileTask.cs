@@ -16,6 +16,7 @@ using System.Reflection.PortableExecutable;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Xml;
 
 namespace SetupTool.Tasks
@@ -51,18 +52,16 @@ namespace SetupTool.Tasks
 			if (File.Exists(Defines.TerrariaPath) && File.Exists(Defines.TerrariaServerPath))
 				return true;
 
-			//return (bool)TaskInterface.Invoke(new Func<bool>(SelectTerrariaDialog));
-
-			return false;
+			return (bool)TaskInterface.Invoke(new Func<bool>(SelectTerrariaDialog));
 		}
 
-		/*public static bool SelectTerrariaDialog()
+		public static bool SelectTerrariaDialog()
 		{
 			while (true)
 			{
 				var dialog = new OpenFileDialog
 				{
-					InitialDirectory = Path.GetFullPath(Directory.Exists(SteamDir) ? SteamDir : "."),
+					InitialDirectory = Path.GetFullPath(Directory.Exists(Defines.SteamDir) ? Defines.SteamDir : "."),
 					Filter = "Terraria|Terraria.exe",
 					Title = "Select Terraria.exe"
 				};
@@ -83,13 +82,12 @@ namespace SetupTool.Tasks
 				}
 				else
 				{
-					Settings.Default.SteamDir = Path.GetDirectoryName(dialog.FileName);
-					Settings.Default.Save();
-					UpdateSteamDirTargetsFile();
+					Defines.SteamDir.Value = Path.GetDirectoryName(dialog.FileName);
+					Utilities.UpdateSteamDirTargetsFile();
 					return true;
 				}
 			}
-		}*/
+		}
 
 		public override void Run()
 		{

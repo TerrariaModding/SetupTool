@@ -1,4 +1,5 @@
 ﻿using DiffPatch;
+using PatchReviewer;
 using SetupTool.Util;
 using System;
 using System.Collections.Concurrent;
@@ -7,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace SetupTool.Tasks
 {
@@ -36,13 +38,13 @@ namespace SetupTool.Tasks
 			this.cutoff = cutoff;
 		}
 
-		/*public override bool StartupWarning()
+		public override bool StartupWarning()
 		{
 			return MessageBox.Show(
 					"Any changes in /" + patchedDir + " that have not been converted to patches will be lost.",
 					"Possible loss of data", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning)
 				== DialogResult.OK;
-		}*/
+		}
 
 		public override void Run()
 		{
@@ -108,24 +110,24 @@ namespace SetupTool.Tasks
 
 			//Show patch reviewer if there were any fuzzy patches.
 
-			//if (fuzzy > 0)
-			//	TaskInterface.Invoke(new Action(() => ShowReviewWindow(results)));
+			if (fuzzy > 0)
+				TaskInterface.Invoke(new Action(() => ShowReviewWindow(results)));
 		}
 
-		/*private void ShowReviewWindow(IEnumerable<FilePatcher> results)
+		private void ShowReviewWindow(IEnumerable<FilePatcher> results)
 		{
 			var w = new ReviewWindow(results, commonBasePath: baseDir + '/')
 			{
 				AutoHeaders = true,
 			};
-			ElementHost.EnableModelessKeyboardInterop(w);
+			//ElementHost.EnableModelessKeyboardInterop(w);
 			w.ShowDialog();
-		}*/
+		}
 
 		public override bool Failed() => failures > 0;
 		public override bool Warnings() => warnings > 0;
 
-		/*public override void FinishedDialog()
+		public override void Finished()
 		{
 			if (fuzzy > 0)
 				return;
@@ -133,7 +135,7 @@ namespace SetupTool.Tasks
 			MessageBox.Show(
 				$"Patches applied with {failures} failures and {warnings} warnings.\nSee /logs/patch.log for details",
 				"Patch Results", MessageBoxButtons.OK, Failed() ? MessageBoxIcon.Error : MessageBoxIcon.Warning);
-		}*/
+		}
 
 		private FilePatcher Patch(string patchPath)
 		{

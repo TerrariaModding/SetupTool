@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace SetupTool.Tasks
 {
@@ -38,7 +39,7 @@ namespace SetupTool.Tasks
 
 		private static string projectPath; //persist across executions
 		
-		/*public override bool Configure() => (bool)TaskInterface.Invoke(new Func<bool>(() => {
+		public override bool Configure() => (bool)TaskInterface.Invoke(new Func<bool>(() => {
 			var dialog = new OpenFileDialog
 			{
 				FileName = projectPath,
@@ -50,7 +51,7 @@ namespace SetupTool.Tasks
 			var result = dialog.ShowDialog();
 			projectPath = dialog.FileName;
 			return result == DialogResult.OK && File.Exists(projectPath);
-		}));*/
+		}));
 
 		public override void Run()
 		{

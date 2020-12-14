@@ -19,6 +19,6 @@ namespace SetupTool.Tasks
 
 		object Invoke(Delegate action);
 
-		IAsyncResult BeginInvoke(Delegate action);
+		//IAsyncResult BeginInvoke(Delegate action);
 	}
 }
