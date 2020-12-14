@@ -26,7 +26,9 @@
         <Button Grid.RowSpan="2" x:Name="btnSetup" Content="Setup" Margin="0 0 3 3" Click="btnSetup_Click"/>
         <Button Grid.Column="2" x:Name="btnDiff" Content="Diff" Margin="3 0 0 3" Click="btnDiff_Click"/>
         <Button Grid.Column="2" Grid.Row="1" x:Name="btnPatch" Margin="3 0 0 3" Content="Patch" Click="btnPatch_Click"/>
-        <ListBox Grid.Column="1" Grid.RowSpan="2" Margin="0 0 0 3" x:Name="lstProjects"/>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Column="1" Grid.RowSpan="2" Margin="0 0 0 3">
+            <ListBox Height="80" x:Name="lstProjects"/>
+        </ScrollViewer>
         <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" BorderThickness="1" BorderBrush="LightGray">
         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                 <TextBlock x:Name="lblStatus" />
