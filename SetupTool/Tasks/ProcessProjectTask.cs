@@ -36,6 +36,21 @@ namespace SetupTool.Tasks
 					baseDir = Path.Combine(Defines.ProjectConfig.SrcDir, _projects[project.Parent].SrcDir);
 				}
 
+                if (project.CopyVanillaPatches)
+                {
+					Console.WriteLine($"{project.Name} has {nameof(project.CopyVanillaPatches)} set to True");
+					Console.WriteLine("Copying vanilla patches...");
+
+                    if (ProjectConfig.VanillaProject == null)
+                        throw new Exception("Unable to copy vanilla patch files as there was no vanilla project instance found");
+					string vanillaPatchesDir = Path.Combine(Defines.ProjectConfig.PatchesDir, ProjectConfig.VanillaProject.PatchesDir);
+                    string projectPatchesDir = Path.Combine(Defines.ProjectConfig.PatchesDir, project.PatchesDir);
+
+					File.Copy(vanillaPatchesDir, projectPatchesDir, true);
+
+					Console.WriteLine("Copied vanilla patches!");
+                }
+
 				new PatchTask(TaskInterface,
 					baseDir,
 					Path.Combine(Defines.ProjectConfig.SrcDir, project.SrcDir),

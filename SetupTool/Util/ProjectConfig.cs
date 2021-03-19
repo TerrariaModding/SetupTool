@@ -10,7 +10,9 @@ using System.Threading.Tasks;
 namespace SetupTool.Util
 {
 	public class ProjectConfig
-	{
+    {
+        public static Project VanillaProject;
+
 		[JsonIgnore]
 		private string _path;
 
@@ -39,7 +41,11 @@ namespace SetupTool.Util
 				conf._path = path;
 				conf.OnLoad();
 
-				return conf;
+				// Fetch and save an instance of the vanilla project for use in copying patch files based on directory locations
+                if (conf.Projects.ContainsKey("Terraria"))
+                    VanillaProject = conf.Projects["Terraria"];
+
+                return conf;
 			}
 			catch (IOException ex)
 			{
@@ -115,6 +121,7 @@ namespace SetupTool.Util
 			public string Parent;
 			public string PatchesDir;
 			public string SrcDir;
-		}
+            public bool CopyVanillaPatches;
+        }
 	}
 }
