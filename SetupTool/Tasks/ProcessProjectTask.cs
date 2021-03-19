@@ -22,45 +22,53 @@ namespace SetupTool.Tasks
 			if (_projects == null)
 				return;
 
-			foreach (var project in _projects.Values)
-			{
-				Console.WriteLine(" - " + project.Name);
+            // Set up all projects that don't require vanilla to be set up before-hand (vanilla is also set up here, ofc)
+			foreach (var project in _projects.Values.Where(x => !x.CopyVanillaPatches))
+                RunProject(project);
 
-				Console.WriteLine("     - Patching...");
+            // Set up all projects that require vanilla *after* vanilla has been set up
+            foreach (var project in _projects.Values.Where(x => x.CopyVanillaPatches))
+                RunProject(project);
+		}
 
-				string baseDir = Defines.ProjectConfig.DecompiledSrcDir;
-				if (!string.IsNullOrEmpty(project.Parent))
-				{
-					if (!_projects.ContainsKey(project.Parent))
-						throw new Exception($"Missing parent '{project.Parent}' for project '{project.Name}'");
-					baseDir = Path.Combine(Defines.ProjectConfig.SrcDir, _projects[project.Parent].SrcDir);
-				}
+        private void RunProject(ProjectConfig.Project project)
+        {
+            Console.WriteLine(" - " + project.Name);
 
-                if (project.CopyVanillaPatches)
-                {
-					Console.WriteLine($"{project.Name} has {nameof(project.CopyVanillaPatches)} set to True");
-					Console.WriteLine("Copying vanilla patches...");
+            Console.WriteLine("     - Patching...");
 
-                    if (ProjectConfig.VanillaProject == null)
-                        throw new Exception("Unable to copy vanilla patch files as there was no vanilla project instance found");
-					string vanillaPatchesDir = Path.Combine(Defines.ProjectConfig.PatchesDir, ProjectConfig.VanillaProject.PatchesDir);
-                    string projectPatchesDir = Path.Combine(Defines.ProjectConfig.PatchesDir, project.PatchesDir);
-                    Directory.CreateDirectory(projectPatchesDir);
+            string baseDir = Defines.ProjectConfig.DecompiledSrcDir;
+            if (!string.IsNullOrEmpty(project.Parent))
+            {
+                if (!_projects.ContainsKey(project.Parent))
+                    throw new Exception($"Missing parent '{project.Parent}' for project '{project.Name}'");
+                baseDir = Path.Combine(Defines.ProjectConfig.SrcDir, _projects[project.Parent].SrcDir);
+            }
 
-                    foreach (FileInfo file in new DirectoryInfo(vanillaPatchesDir).GetFiles())
-                        file.CopyTo(Path.Combine(projectPatchesDir, file.Name), true);
-						
+            if (project.CopyVanillaPatches)
+            {
+                Console.WriteLine($"{project.Name} has {nameof(project.CopyVanillaPatches)} set to True");
+                Console.WriteLine("Copying vanilla patches...");
 
-					Console.WriteLine("Copied vanilla patches!");
-                }
+                if (ProjectConfig.VanillaProject == null)
+                    throw new Exception("Unable to copy vanilla patch files as there was no vanilla project instance found");
+                string vanillaPatchesDir = Path.Combine(Defines.ProjectConfig.PatchesDir, ProjectConfig.VanillaProject.PatchesDir);
+                string projectPatchesDir = Path.Combine(Defines.ProjectConfig.PatchesDir, project.PatchesDir);
+                Directory.CreateDirectory(projectPatchesDir);
 
-				new PatchTask(TaskInterface,
-					baseDir,
-					Path.Combine(Defines.ProjectConfig.SrcDir, project.SrcDir),
-					Path.Combine(Defines.ProjectConfig.PatchesDir, project.PatchesDir),
-					new JsonProperty<DateTime>(Defines.Settings, project.Name + "DiffCutoff", new DateTime(2015, 01, 01)))
-				.Run();
-			}
+                foreach (FileInfo file in new DirectoryInfo(vanillaPatchesDir).GetFiles())
+                    file.CopyTo(Path.Combine(projectPatchesDir, file.Name), true);
+
+
+                Console.WriteLine("Copied vanilla patches!");
+            }
+
+            new PatchTask(TaskInterface,
+                    baseDir,
+                    Path.Combine(Defines.ProjectConfig.SrcDir, project.SrcDir),
+                    Path.Combine(Defines.ProjectConfig.PatchesDir, project.PatchesDir),
+                    new JsonProperty<DateTime>(Defines.Settings, project.Name + "DiffCutoff", new DateTime(2015, 01, 01)))
+                .Run();
 		}
 	}
 }
