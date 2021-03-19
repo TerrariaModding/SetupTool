@@ -11,7 +11,9 @@ using System.Threading.Tasks;
 namespace SetupTool
 {
 	public static class Defines
-	{
+    {
+        public static ProjectConfig.Project VanillaProject;
+
 		public static readonly string AppDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
 		// Config Files
@@ -26,7 +28,8 @@ namespace SetupTool
 			try
 			{
 				ProjectConfig = ProjectConfig.Load("config.json");
-			}
+                VanillaProject = ProjectConfig.Projects["Terraria"];
+            }
 			catch (ProjectIOException ex)
 			{
 				ex.PrintStackTrace();

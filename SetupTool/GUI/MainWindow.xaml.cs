@@ -85,7 +85,7 @@ namespace SetupTool.GUI
 		{
 			if (lstProjects.SelectedItem == null)
 				return;
-			string name = lstProjects.SelectedItem.ToString();
+            string name = lstProjects.SelectedItem.ToString()?.Split('-')[0];
 
 			var projects = Defines.ProjectConfig.Projects;
 			if (!projects.ContainsKey(name))
@@ -113,7 +113,7 @@ namespace SetupTool.GUI
 		{
 			if (lstProjects.SelectedItem == null)
 				return;
-			string name = lstProjects.SelectedItem.ToString();
+			string name = lstProjects.SelectedItem.ToString()?.Split('-')[0];
 
 			var projects = Defines.ProjectConfig.Projects;
 			if (!projects.ContainsKey(name))
@@ -133,7 +133,8 @@ namespace SetupTool.GUI
 				baseDir,
 				System.IO.Path.Combine(Defines.ProjectConfig.SrcDir, project.SrcDir),
 				System.IO.Path.Combine(Defines.ProjectConfig.PatchesDir, project.PatchesDir),
-				new JsonProperty<DateTime>(Defines.Settings, project.Name + "DiffCutoff", new DateTime(2015, 01, 01)))
+				new JsonProperty<DateTime>(Defines.Settings, project.Name + "DiffCutoff", new DateTime(2015, 01, 01)),
+                project.Name)
 			);
 		}
 
@@ -142,9 +143,16 @@ namespace SetupTool.GUI
 			var projects = Defines.ProjectConfig.Projects;
 
 			foreach (var project in projects)
-			{
-				lstProjects.Items.Add(project.Value.Name);
-			}
+            {
+                string name = project.Value.Name + "-Reliant on: ";
+
+                if (project.Value.ReliantOn.Count > 0)
+                    name += string.Join(", ", project.Value.ReliantOn);
+                else
+                    name += "Nothing";
+
+				lstProjects.Items.Add(name);
+            }
 		}
 
 		private void RunTask(BaseTask task)
@@ -190,8 +198,8 @@ namespace SetupTool.GUI
 					return;
 				}
 
-				if (task.Failed() || task.Warnings())
-					task.Finished();
+                if (task.Failed() || task.Warnings())
+                    task.Finished();
 
 				Invoke(new Action(() =>
 				{
@@ -239,5 +247,5 @@ namespace SetupTool.GUI
 		{
 			cancelSource.Cancel();
 		}
-	}
+    }
 }

@@ -9,8 +9,10 @@ using System.Threading.Tasks;
 namespace SetupTool.Tasks
 {
 	public class ProcessProjectTask : BaseTask
-	{
-		private Dictionary<string, ProjectConfig.Project> _projects;
+    {
+        public static List<string> PatchedProjects;
+
+        private Dictionary<string, ProjectConfig.Project> _projects;
 
 		public ProcessProjectTask(ITaskInterface taskInterface, Dictionary<string, ProjectConfig.Project> projects) : base(taskInterface)
 		{
@@ -22,14 +24,26 @@ namespace SetupTool.Tasks
 			if (_projects == null)
 				return;
 
-            // Set up all projects that don't require vanilla to be set up before-hand (vanilla is also set up here, ofc)
-			foreach (var project in _projects.Values.Where(x => !x.CopyVanillaPatches))
-                RunProject(project);
+            PatchedProjects = new List<string>();
+            Dictionary<string, ProjectConfig.Project> projectsToRun = _projects;
 
-            // Set up all projects that require vanilla *after* vanilla has been set up
-            foreach (var project in _projects.Values.Where(x => x.CopyVanillaPatches))
-                RunProject(project);
-		}
+            while (projectsToRun.Keys.Count > 0)
+                foreach (ProjectConfig.Project project in _projects.Values)
+                {
+                    bool missingRef = false;
+
+                    foreach (string refProj in project.ReliantOn.Where(refProj => !PatchedProjects.Contains(refProj)))
+                        missingRef = true;
+
+                    if (missingRef)
+                        continue;
+                    
+                    RunProject(project);
+                    projectsToRun.Remove(project.Name);
+                }
+
+            PatchedProjects = new List<string>();
+        }
 
         private void RunProject(ProjectConfig.Project project)
         {
@@ -45,29 +59,38 @@ namespace SetupTool.Tasks
                 baseDir = Path.Combine(Defines.ProjectConfig.SrcDir, _projects[project.Parent].SrcDir);
             }
 
-            if (project.CopyVanillaPatches)
+            if (project.ReliantOn.Count > 0)
             {
-                Console.WriteLine($"{project.Name} has {nameof(project.CopyVanillaPatches)} set to True");
-                Console.WriteLine("Copying vanilla patches...");
+                Console.WriteLine($"Copying projects that {project.Name} relies on for patching!");
 
-                if (ProjectConfig.VanillaProject == null)
-                    throw new Exception("Unable to copy vanilla patch files as there was no vanilla project instance found");
-                string vanillaPatchesDir = Path.Combine(Defines.ProjectConfig.PatchesDir, ProjectConfig.VanillaProject.PatchesDir);
-                string projectPatchesDir = Path.Combine(Defines.ProjectConfig.PatchesDir, project.PatchesDir);
-                Directory.CreateDirectory(projectPatchesDir);
+                foreach (string projectString in project.ReliantOn)
+                {
+                    Console.WriteLine("Copying reliant patches...");
+                    ProjectConfig.Project refProject = projectString == "Terraria" 
+                        ? Defines.VanillaProject 
+                        : Defines.ProjectConfig.Projects[projectString];
 
-                foreach (FileInfo file in new DirectoryInfo(vanillaPatchesDir).GetFiles())
-                    file.CopyTo(Path.Combine(projectPatchesDir, file.Name), true);
+                    string vanillaPatchesDir = Path.Combine(Defines.ProjectConfig.PatchesDir, refProject.PatchesDir);
+                    string projectPatchesDir = Path.Combine(Defines.ProjectConfig.PatchesDir, project.PatchesDir);
+                    Directory.CreateDirectory(projectPatchesDir);
+
+                    foreach (string dir in Directory.GetDirectories(vanillaPatchesDir, "*", SearchOption.AllDirectories))
+                        Directory.CreateDirectory(dir.Replace(vanillaPatchesDir, projectPatchesDir));
+
+                    foreach (string file in Directory.GetFiles(vanillaPatchesDir, "*", SearchOption.AllDirectories))
+                        File.Copy(file, file.Replace(vanillaPatchesDir, projectPatchesDir), true);
 
 
-                Console.WriteLine("Copied vanilla patches!");
+                    Console.WriteLine("Copied reliant patches!");
+                }
             }
 
             new PatchTask(TaskInterface,
                     baseDir,
                     Path.Combine(Defines.ProjectConfig.SrcDir, project.SrcDir),
                     Path.Combine(Defines.ProjectConfig.PatchesDir, project.PatchesDir),
-                    new JsonProperty<DateTime>(Defines.Settings, project.Name + "DiffCutoff", new DateTime(2015, 01, 01)))
+                    new JsonProperty<DateTime>(Defines.Settings, project.Name + "DiffCutoff", new DateTime(2015, 01, 01)),
+                    project.Name)
                 .Run();
 		}
 	}

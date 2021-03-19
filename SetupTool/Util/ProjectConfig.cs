@@ -11,9 +11,7 @@ namespace SetupTool.Util
 {
 	public class ProjectConfig
     {
-        public static Project VanillaProject;
-
-		[JsonIgnore]
+        [JsonIgnore]
 		private string _path;
 
 		public string ConfigPath => _path;
@@ -39,11 +37,7 @@ namespace SetupTool.Util
 			{
 				var conf = JsonConvert.DeserializeObject<ProjectConfig>(File.ReadAllText(path));
 				conf._path = path;
-				conf.OnLoad();
-
-				// Fetch and save an instance of the vanilla project for use in copying patch files based on directory locations
-                if (conf.Projects.ContainsKey("Terraria"))
-                    VanillaProject = conf.Projects["Terraria"];
+                conf.OnLoad();
 
                 return conf;
 			}
@@ -86,7 +80,9 @@ namespace SetupTool.Util
 						errors.Add($"Missing 'Projects/{project.Key}/PatchesDir");
 					if (string.IsNullOrWhiteSpace(project.Value.SrcDir))
 						errors.Add($"Missing 'Projects/{project.Key}/SrcDir");
-				}
+
+                    project.Value.ReliantOn ??= new List<string>();
+                }
 			}
 
 			if (errors.Count > 0)
@@ -121,7 +117,7 @@ namespace SetupTool.Util
 			public string Parent;
 			public string PatchesDir;
 			public string SrcDir;
-            public bool CopyVanillaPatches;
+            public List<string> ReliantOn;
         }
 	}
 }

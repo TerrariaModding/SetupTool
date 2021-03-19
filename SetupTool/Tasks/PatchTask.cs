@@ -13,7 +13,7 @@ using System.Windows.Forms;
 namespace SetupTool.Tasks
 {
 	class PatchTask : BaseTask
-	{
+    {
 		private static string[] nonSourceDirs = { "bin", "obj", ".vs" };
 		public static IEnumerable<(string file, string relPath)> EnumerateSrcFiles(string dir) =>
 			EnumerateFiles(dir).Where(f => !f.relPath.Split('/', '\\').Any(nonSourceDirs.Contains));
@@ -27,16 +27,18 @@ namespace SetupTool.Tasks
 		private int failures;
 		private int fuzzy;
 		private StreamWriter logFile;
+        private string name;
 
 		private readonly ConcurrentBag<FilePatcher> results = new ConcurrentBag<FilePatcher>();
 
-		public PatchTask(ITaskInterface taskInterface, string baseDir, string patchedDir, string patchDir, JsonProperty<DateTime> cutoff) : base(taskInterface)
+		public PatchTask(ITaskInterface taskInterface, string baseDir, string patchedDir, string patchDir, JsonProperty<DateTime> cutoff, string name) : base(taskInterface)
 		{
 			this.baseDir = PreparePath(baseDir);
 			this.patchedDir = PreparePath(patchedDir);
 			this.patchDir = PreparePath(patchDir);
 			this.cutoff = cutoff;
-		}
+            this.name = name;
+        }
 
 		public override bool StartupWarning()
 		{
@@ -86,6 +88,8 @@ namespace SetupTool.Tasks
 				}
 			}
 
+            ProcessProjectTask.PatchedProjects.Add(name);
+
 			try
 			{
 				CreateDirectory(Defines.ProjectConfig.LogsDir);
@@ -115,7 +119,7 @@ namespace SetupTool.Tasks
 
 			if (fuzzy > 0)
 				TaskInterface.Invoke(new Action(() => ShowReviewWindow(results)));
-		}
+        }
 
 		private void ShowReviewWindow(IEnumerable<FilePatcher> results)
 		{
@@ -132,15 +136,15 @@ namespace SetupTool.Tasks
 
 		public override void Finished()
 		{
-			if (fuzzy > 0)
+            if (fuzzy > 0)
 				return;
 
 			MessageBox.Show(
 				$"Patches applied with {failures} failures and {warnings} warnings.\nSee /logs/patch.log for details",
 				"Patch Results", MessageBoxButtons.OK, Failed() ? MessageBoxIcon.Error : MessageBoxIcon.Warning);
-		}
+        }
 
-		private FilePatcher Patch(string patchPath)
+        private FilePatcher Patch(string patchPath)
 		{
 			var patcher = FilePatcher.FromPatchFile(patchPath);
 			patcher.Patch(mode);

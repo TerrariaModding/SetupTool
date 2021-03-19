@@ -193,5 +193,5 @@ namespace SetupTool.Tasks
 		public virtual bool Warnings() => false;
 
 		public virtual void Finished() { }
-	}
+    }
 }
