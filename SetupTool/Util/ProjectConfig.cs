@@ -23,6 +23,7 @@ namespace SetupTool.Util
 		public string SrcDir;
 		public string DecompSrcDir;
 		public Dictionary<string, Project> Projects;
+        public string[] DiffExtensions;
 
 		public string DecompiledSrcDir => Path.Combine(SrcDir, DecompSrcDir);
 
@@ -67,6 +68,18 @@ namespace SetupTool.Util
 				errors.Add("Missing 'SrcDir'");
 			if (string.IsNullOrWhiteSpace(DecompSrcDir))
 				errors.Add("Missing 'DecompSrcDir");
+
+            DiffExtensions ??= new[]
+            {
+                ".cs",
+                ".csproj", 
+                ".ico",
+                ".resx", 
+                ".png", 
+                "App.config", 
+                ".json",
+                ".targets"
+            };
 			
 			if (Projects == null)
 				errors.Add("Missing 'Projects'");

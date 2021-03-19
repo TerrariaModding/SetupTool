@@ -11,8 +11,8 @@ using System.Threading.Tasks;
 namespace SetupTool.Tasks
 {
 	public class DiffTask : BaseTask
-	{
-		private static string[] extensions = { ".cs", ".csproj", ".ico", ".resx", ".png", "App.config", ".json", ".targets" };
+    {
+        private static string[] extensions => Defines.ProjectConfig.DiffExtensions;
 		private static bool IsDiffable(string relPath) => extensions.Any(relPath.EndsWith);
 
 		public static readonly string RemovedFileList = "removed_files.list";
