@@ -45,8 +45,11 @@ namespace SetupTool.Tasks
                         throw new Exception("Unable to copy vanilla patch files as there was no vanilla project instance found");
 					string vanillaPatchesDir = Path.Combine(Defines.ProjectConfig.PatchesDir, ProjectConfig.VanillaProject.PatchesDir);
                     string projectPatchesDir = Path.Combine(Defines.ProjectConfig.PatchesDir, project.PatchesDir);
+                    Directory.CreateDirectory(projectPatchesDir);
 
-					File.Copy(vanillaPatchesDir, projectPatchesDir, true);
+                    foreach (FileInfo file in new DirectoryInfo(vanillaPatchesDir).GetFiles())
+                        file.CopyTo(Path.Combine(projectPatchesDir, file.Name), true);
+						
 
 					Console.WriteLine("Copied vanilla patches!");
                 }
