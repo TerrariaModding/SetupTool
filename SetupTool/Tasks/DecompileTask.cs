@@ -401,7 +401,7 @@ namespace SetupTool.Tasks
 				CreateParentDirectory(path);
 
 				using (var sw = new StreamWriter(path))
-				using (var w = new XmlTextWriter(sw))
+				using (var w = CreateXmlWriter(sw))
 				{
 					w.Formatting = System.Xml.Formatting.Indented;
 					w.WriteStartElement("Project");
@@ -448,7 +448,7 @@ namespace SetupTool.Tasks
 				CreateParentDirectory(path);
 
 				using (var sw = new StreamWriter(path))
-				using (var w = new XmlTextWriter(sw))
+				using (var w = CreateXmlWriter(sw))
 				{
 					w.Formatting = System.Xml.Formatting.Indented;
 					w.WriteStartElement("Project");
@@ -484,6 +484,16 @@ namespace SetupTool.Tasks
 					sw.Write(Environment.NewLine);
 				}
 			});
+		}
+
+		private static XmlTextWriter CreateXmlWriter(StreamWriter streamWriter)
+		{
+			return new XmlTextWriter(streamWriter)
+			{
+				Formatting = System.Xml.Formatting.Indented,
+				IndentChar = '\t',
+				Indentation = 1,
+			};
 		}
 
 		private IEnumerable<string> ApplyWildcards(IEnumerable<string> include, IReadOnlyList<string> exclude)

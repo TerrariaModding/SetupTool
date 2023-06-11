@@ -15,11 +15,17 @@ namespace SetupTool.Formatting
 				return node;// nothing to do here
 
 			if (node.IsKind(SyntaxKind.ComplexElementInitializerExpression))
-				return VisitElementInitializer(node);
+				node = VisitElementInitializer(node);
 
-			if (!node.IsKind(SyntaxKind.CollectionInitializerExpression) && !node.IsKind(SyntaxKind.ArrayInitializerExpression))
-				return node;
+			if (node.IsKind(SyntaxKind.CollectionInitializerExpression) || node.IsKind(SyntaxKind.ArrayInitializerExpression))
+				FixIndentation(node);
 
+			return base.VisitInitializerExpression(node);
+		}
+
+		// the C# formatter sometimes just doesn't get these right...
+		private void FixIndentation(InitializerExpressionSyntax node)
+		{
 			var indent = node.GetIndentation();
 
 			var exprList = node.Expressions;
@@ -35,8 +41,6 @@ namespace SetupTool.Formatting
 			if (prevNode.GetTrailingTrivia().Any(SyntaxKind.EndOfLineTrivia)) {
 				AddChange(node.CloseBraceToken, node.CloseBraceToken.WithLeadingWhitespace(indent));
 			}
-
-			return base.VisitInitializerExpression(node);
 		}
 
 		private void AddChange(SyntaxToken node, SyntaxToken replacement) {
@@ -51,8 +55,8 @@ namespace SetupTool.Formatting
 			return base.VisitToken(token);
 		}
 
-		private SyntaxNode VisitElementInitializer(InitializerExpressionSyntax node) {
-			if (node.Expressions.Count != 2 && node.Expressions.All(SyntaxUtils.SpansSingleLine) && node.Expressions.Sum(n => n.Span.Length) < 80)
+		private InitializerExpressionSyntax VisitElementInitializer(InitializerExpressionSyntax node) {
+			if (node.Expressions.Count != 2 || !node.Expressions.All(SyntaxUtils.SpansSingleLine))
 				return node;
 
 			var exprs = node.Expressions;
