@@ -19,7 +19,7 @@ namespace SetupTool.Util
 $@"<?xml version=""1.0"" encoding=""utf-8""?>
 <Project ToolsVersion=""14.0"" xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
   <PropertyGroup>
-    <TerrariaSteamPath>{Defines.SteamDir}</TerrariaSteamPath>
+    <TerrariaSteamPath>{Defines.SteamDir.Value}</TerrariaSteamPath>
   </PropertyGroup>
 </Project>";
 
