@@ -66,10 +66,14 @@ namespace SetupTool.Formatting
 					exprs[1].WithLeadingTrivia().WithTrailingTrivia(SyntaxFactory.Whitespace(" "))
 				));
 
+			var closeBrace = node.CloseBraceToken.WithLeadingTrivia(SyntaxTriviaList.Empty);
+			if (node != ((InitializerExpressionSyntax)node.Parent).Expressions.Last())
+				closeBrace = closeBrace.WithTrailingTrivia(SyntaxTriviaList.Empty);
+
 			return node
 				.WithOpenBraceToken(node.OpenBraceToken.WithTrailingTrivia(SyntaxFactory.Whitespace(" ")))
 				.WithExpressions(exprs)
-				.WithCloseBraceToken(node.CloseBraceToken.WithoutTrivia());
+				.WithCloseBraceToken(closeBrace);
 		}
 	}
 }
