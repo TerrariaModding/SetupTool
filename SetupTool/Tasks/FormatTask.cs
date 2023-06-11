@@ -20,19 +20,27 @@ namespace SetupTool.Tasks
 		private static AdhocWorkspace workspace = new AdhocWorkspace();
 		static FormatTask()
 		{
-			//FixRoslynFormatter.Apply();
+			var optionSet = workspace.CurrentSolution.Options;
 
-			workspace.TryApplyChanges(workspace.CurrentSolution.WithOptions(workspace.Options
-				.WithChangedOption(new OptionKey(FormattingOptions.UseTabs, LanguageNames.CSharp), true)
-				.WithChangedOption(CSharpFormattingOptions.NewLinesForBracesInMethods, false)
+			// Essentials
+			optionSet = optionSet.WithChangedOption(FormattingOptions.UseTabs, LanguageNames.CSharp, true);
+
+			// K&R
+			optionSet = optionSet
 				.WithChangedOption(CSharpFormattingOptions.NewLinesForBracesInProperties, false)
 				.WithChangedOption(CSharpFormattingOptions.NewLinesForBracesInAccessors, false)
 				.WithChangedOption(CSharpFormattingOptions.NewLinesForBracesInAnonymousMethods, false)
 				.WithChangedOption(CSharpFormattingOptions.NewLinesForBracesInControlBlocks, false)
 				.WithChangedOption(CSharpFormattingOptions.NewLinesForBracesInAnonymousTypes, false)
 				.WithChangedOption(CSharpFormattingOptions.NewLinesForBracesInObjectCollectionArrayInitializers, false)
-				.WithChangedOption(CSharpFormattingOptions.NewLinesForBracesInLambdaExpressionBody, false))
-			);
+				.WithChangedOption(CSharpFormattingOptions.NewLinesForBracesInLambdaExpressionBody, false);
+
+			// Fix switch indentation
+			optionSet = optionSet
+				.WithChangedOption(CSharpFormattingOptions.IndentSwitchCaseSection, true)
+				.WithChangedOption(CSharpFormattingOptions.IndentSwitchCaseSectionWhenBlock, false);
+
+			workspace.TryApplyChanges(workspace.CurrentSolution.WithOptions(optionSet));
 		}
 
 		public FormatTask(ITaskInterface taskInterface) : base(taskInterface) { }
