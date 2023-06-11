@@ -1,6 +1,7 @@
 ﻿using ICSharpCode.Decompiler;
 using ICSharpCode.Decompiler.CSharp;
 using ICSharpCode.Decompiler.CSharp.OutputVisitor;
+using ICSharpCode.Decompiler.CSharp.ProjectDecompiler;
 using ICSharpCode.Decompiler.CSharp.Transforms;
 using ICSharpCode.Decompiler.Metadata;
 using ICSharpCode.Decompiler.TypeSystem;
@@ -25,7 +26,11 @@ namespace SetupTool.Tasks
 	{
 		private class ExtendedProjectDecompiler : WholeProjectDecompiler
 		{
-			public new bool IncludeTypeWhenDecompilingProject(PEFile module, TypeDefinitionHandle type) => base.IncludeTypeWhenDecompilingProject(module, type);
+			public ExtendedProjectDecompiler(DecompilerSettings settings, IAssemblyResolver assemblyResolver)
+				: base(settings, assemblyResolver, assemblyReferenceClassifier: null, debugInfoProvider: null) { }
+
+			public new bool IncludeTypeWhenDecompilingProject(PEFile module, TypeDefinitionHandle type)
+				=> base.IncludeTypeWhenDecompilingProject(module, type);
 		}
 
 		private readonly string _srcDir;
@@ -34,17 +39,34 @@ namespace SetupTool.Tasks
 
 		private ExtendedProjectDecompiler projectDecompiler;
 
-		private readonly DecompilerSettings _decompilerSettings = new DecompilerSettings(LanguageVersion.Latest)
-		{
-			RemoveDeadCode = true,
-			CSharpFormattingOptions = FormattingOptionsFactory.CreateKRStyle()
-		};
+		private readonly DecompilerSettings _decompilerSettings;
 
 		public DecompileTask(ITaskInterface task, string srcDir, bool serverOnly = false, bool formatOutput = true) : base(task)
 		{
 			_srcDir = srcDir;
 			_serverOnly = serverOnly;
 			_formatOutput = formatOutput;
+
+			var formatting = FormattingOptionsFactory.CreateKRStyle();
+
+			// Arrays should have a new line for every entry, since it's easier to insert values in patches that way.
+			formatting.ArrayInitializerWrapping = Wrapping.WrapAlways;
+			formatting.ArrayInitializerBraceStyle = BraceStyle.EndOfLine;
+
+			// Force wrapping for chained calls for the same reason.
+			// Hm, doesn't work.
+			//formatting.ChainedMethodCallWrapping = Wrapping.WrapAlways;
+
+			_decompilerSettings = new(LanguageVersion.Latest)
+			{
+				RemoveDeadCode = true,
+				CSharpFormattingOptions = formatting,
+
+				// Switch expressions are not patching-friendly,
+				// and do not even support expression bodies at this time:
+				// https://github.com/dotnet/csharplang/issues/3037
+				SwitchExpressions = false,
+			};
 		}
 
 		public override bool Configure()
@@ -99,11 +121,9 @@ namespace SetupTool.Tasks
 			var serverModule = ReadModule(Defines.TerrariaServerPath, new Version(Defines.ProjectConfig.ServerVersion));
 			var mainModule = _serverOnly ? serverModule : clientModule;
 
-			projectDecompiler = new ExtendedProjectDecompiler
-			{
-				Settings = _decompilerSettings,
-				AssemblyResolver = new EmbeddedAssemblyResolver(mainModule, mainModule.Reader.DetectTargetFrameworkId())
-			};
+			var embeddedAssemblyResolver = new EmbeddedAssemblyResolver(mainModule, mainModule.DetectTargetFrameworkId());
+
+			projectDecompiler = new ExtendedProjectDecompiler(_decompilerSettings, embeddedAssemblyResolver);
 
 
 			var items = new List<WorkItem>();
