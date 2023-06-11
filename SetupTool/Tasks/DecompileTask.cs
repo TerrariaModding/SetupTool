@@ -365,27 +365,35 @@ namespace SetupTool.Tasks
 
 				// references
 				w.WriteStartElement("ItemGroup");
-				foreach (var r in module.AssemblyReferences.OrderBy(r => r.Name))
+
+				var references = module.AssemblyReferences.Where(r => r.Name != "mscorlib").OrderBy(r => r.Name).ToArray();
+				var projectReferences = decompiledLibraries != null
+					? references.Where(r => decompiledLibraries.Contains(r.Name)).ToArray()
+					: Array.Empty<ICSharpCode.Decompiler.Metadata.AssemblyReference>();
+				var normalReferences = references.Except(projectReferences).ToArray();
+
+				foreach (var r in projectReferences)
 				{
-					if (r.Name == "mscorlib") continue;
-
-					if (decompiledLibraries?.Contains(r.Name) ?? false)
-					{
-						w.WriteStartElement("ProjectReference");
-						w.WriteAttributeString("Include", $"../{r.Name}/{r.Name}.csproj");
-						w.WriteEndElement();
-
-						w.WriteStartElement("EmbeddedResource");
-						w.WriteAttributeString("Include", $"../{r.Name}/bin/$(Configuration)/$(TargetFramework)/{r.Name}.dll");
-						w.WriteElementString("LogicalName", $"Terraria.Libraries.{r.Name}.{r.Name}.dll");
-					}
-					else
-					{
-						w.WriteStartElement("Reference");
-						w.WriteAttributeString("Include", r.Name);
-					}
+					w.WriteStartElement("ProjectReference");
+					w.WriteAttributeString("Include", $"../{r.Name}/{r.Name}.csproj");
 					w.WriteEndElement();
 				}
+
+				foreach (var r in projectReferences)
+				{
+					w.WriteStartElement("EmbeddedResource");
+					w.WriteAttributeString("Include", $"../{r.Name}/bin/$(Configuration)/$(TargetFramework)/{r.Name}.dll");
+					w.WriteElementString("LogicalName", $"Terraria.Libraries.{r.Name}.{r.Name}.dll");
+					w.WriteEndElement();
+				}
+
+				foreach (var r in normalReferences)
+				{
+					w.WriteStartElement("Reference");
+					w.WriteAttributeString("Include", r.Name);
+					w.WriteEndElement();
+				}
+
 				w.WriteEndElement(); // </ItemGroup>
 
 			});
