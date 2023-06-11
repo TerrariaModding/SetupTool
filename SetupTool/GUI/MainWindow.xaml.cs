@@ -1,4 +1,5 @@
-﻿using SetupTool.Tasks;
+﻿using DiffPatch;
+using SetupTool.Tasks;
 using SetupTool.Util;
 using System;
 using System.Collections.Generic;
@@ -139,6 +140,11 @@ namespace SetupTool.GUI
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
+			Patcher.Mode mode = (Patcher.Mode) Defines.PatchMode.Value;
+			rdoExact.IsChecked = mode == Patcher.Mode.EXACT;
+			rdoOffset.IsChecked = mode == Patcher.Mode.OFFSET;
+			rdoFuzzy.IsChecked = mode == Patcher.Mode.FUZZY;
+
 			var projects = Defines.ProjectConfig.Projects;
 
 			foreach (var project in projects)
@@ -238,6 +244,21 @@ namespace SetupTool.GUI
 		private void btnCancel_Click(object sender, RoutedEventArgs e)
 		{
 			cancelSource.Cancel();
+		}
+
+		private void rdoExact_Click(object sender, RoutedEventArgs e)
+		{
+			Defines.PatchMode.Value = (int)Patcher.Mode.EXACT;
+		}
+
+		private void rdoOffset_Click(object sender, RoutedEventArgs e)
+		{
+			Defines.PatchMode.Value = (int)Patcher.Mode.OFFSET;
+		}
+
+		private void rdoFuzzy_Click(object sender, RoutedEventArgs e)
+		{
+			Defines.PatchMode.Value = (int)Patcher.Mode.FUZZY;
 		}
 	}
 }

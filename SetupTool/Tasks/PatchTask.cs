@@ -48,7 +48,7 @@ namespace SetupTool.Tasks
 
 		public override void Run()
 		{
-			mode = Patcher.Mode.EXACT;// TODO: Configurable
+			mode = (Patcher.Mode)Defines.PatchMode.Value;
 
 			string removedFileList = Path.Combine(patchDir, DiffTask.RemovedFileList);
 			var noCopy = File.Exists(removedFileList) ? new HashSet<string>(File.ReadAllLines(removedFileList)) : new HashSet<string>();

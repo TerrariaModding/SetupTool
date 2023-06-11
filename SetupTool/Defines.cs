@@ -48,5 +48,6 @@ namespace SetupTool
 		public static JsonProperty<string> SteamDir = new JsonProperty<string>(Settings, "SteamDir", @"C:\Program Files (x86)\Steam\steamapps\common\terraria");
 		public static JsonProperty<string> TerrariaPath = new JsonProperty<string>(Settings, "TerrariaPath", Path.Combine(SteamDir, "Terraria.exe"));
 		public static JsonProperty<string> TerrariaServerPath = new JsonProperty<string>(Settings, "TerrariaServerPath", Path.Combine(SteamDir, "TerrariaServer.exe"));
+		public static JsonProperty<int> PatchMode = new JsonProperty<int>(Settings, "PatchMode", 0);
 	}
 }

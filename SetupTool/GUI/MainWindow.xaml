@@ -15,6 +15,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="40" />
         </Grid.RowDefinitions>
@@ -29,13 +30,18 @@
         <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Column="1" Grid.RowSpan="2" Margin="0 0 0 3">
             <ListBox Height="80" x:Name="lstProjects"/>
         </ScrollViewer>
-        <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" BorderThickness="1" BorderBrush="LightGray">
+        <StackPanel Grid.Column="1" Grid.Row="2" Orientation="Horizontal">
+            <RadioButton Margin="0 0 5 0" x:Name="rdoExact" Content="Exact" Click="rdoExact_Click"/>
+            <RadioButton Margin="0 0 5 0" x:Name="rdoOffset" Content="Offset" Click="rdoOffset_Click"/>
+            <RadioButton Margin="0 0 5 0" x:Name="rdoFuzzy" Content="Fuzzy" Click="rdoFuzzy_Click"/>
+        </StackPanel>
+        <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="3" BorderThickness="1" BorderBrush="LightGray">
         <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
                 <TextBlock x:Name="lblStatus" />
         </ScrollViewer>
         </Border>
 
-        <ProgressBar Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" Margin="0 3 0 0" x:Name="pbMain"/>
-        <Button Grid.Column="2" Grid.Row="3" Margin="3 3 0 0" Content="Cancel" IsEnabled="false" x:Name="btnCancel" Click="btnCancel_Click" />
+        <ProgressBar Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" Margin="0 3 0 0" x:Name="pbMain"/>
+        <Button Grid.Column="2" Grid.Row="4" Margin="3 3 0 0" Content="Cancel" IsEnabled="false" x:Name="btnCancel" Click="btnCancel_Click" />
     </Grid>
 </Window>
